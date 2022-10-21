@@ -59,7 +59,7 @@ const ${sliceNameLowerCase}Slice = createSlice({
   },
 });
 
-export default ${sliceNameLowerCase}Slice`;
+export default ${sliceNameLowerCase}Slice;`;
 
   fs.writeFileSync(`./src/store/${sliceNameLowerCase}.ts`, sliceContent);
 
