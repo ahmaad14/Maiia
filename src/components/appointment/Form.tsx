@@ -8,6 +8,7 @@ import CustomTable from '../CustomTable';
 import { makeStyles } from '@material-ui/core';
 import { useFormik } from 'formik';
 import config from 'config';
+import useFetchAvailabilities from 'utils/useFetchAvailabilities';
 import AppointmentFormValues from 'types/AppointmentFormValues';
 
 type Props = {
@@ -31,8 +32,6 @@ const useStyles = makeStyles({
 });
 
 const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
-  const [availabilities, setAvailabilities] = useState([]);
-  const dispatch = useDispatch();
   const classes = useStyles();
 
   //selectors
@@ -66,32 +65,7 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
   });
 
   const { practitionerId, patientId, availabilityId } = formik.values;
-
-  useEffect(() => {
-    dispatch(getPractitioners());
-    dispatch(getPatients());
-  }, []);
-
-  useEffect(() => {
-    let isCurrent = true;
-    const getAvailabilities = async () => {
-      if (!practitionerId) return [];
-      const SERVER_API_ENDPOINT = config.get('SERVER_API_ENDPOING', '/api');
-      const response = await fetch(
-        `${SERVER_API_ENDPOINT}/availabilities?practitionerId=${+practitionerId}`,
-      );
-      const parsedResponse = await response.json();
-      setAvailabilities(parsedResponse);
-
-      return parsedResponse;
-    };
-
-    if (isCurrent) getAvailabilities();
-
-    return () => {
-      isCurrent = false;
-    };
-  }, [practitionerId]);
+  const availabilities = useFetchAvailabilities(practitionerId);
 
   // get availability Id default value
   useEffect(() => {
@@ -105,6 +79,10 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
       formik.setFieldValue('availabilityId', defaultAvailability?.id);
     }
   }, [availabilities]);
+
+  useEffect(() => {
+    formik.setFieldValue('availabilityId', '');
+  }, [practitionerId]);
 
   function validate(values) {
     const errors = {};
