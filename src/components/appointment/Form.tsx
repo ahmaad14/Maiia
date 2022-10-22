@@ -1,24 +1,37 @@
 import { useSelector } from 'react-redux';
-import { Button, Grid, Radio } from '@material-ui/core';
+
+import {
+  Button,
+  Grid,
+  Radio,
+  InputAdornment,
+  TextField,
+} from '@material-ui/core';
+import SearchIcon from '@material-ui/icons/Search';
+
 import { practitionersSelectors } from 'store/practitioners';
 import { patientsSelectors } from 'store/patients';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { formatDateRange } from 'utils/date';
 import CustomTable from '../CustomTable';
 import { makeStyles } from '@material-ui/core';
 import { useFormik } from 'formik';
 import useFetchAvailabilities from 'utils/useFetchAvailabilities';
 import AppointmentFormValues from 'types/AppointmentFormValues';
-
+import filterByName from '../../utils/filterByName';
 type Props = {
   onSubmit: (formValues: AppointmentFormValues) => void;
   defaultValues?: AppointmentFormValues;
 };
 const useStyles = makeStyles({
   layout: {
-    alignItems: 'flex-start',
+    alignItems: 'flex-start !important',
     justifyContent: 'space-between',
     marginBlock: 20,
+    '& > div': {
+      minWidth: '50%',
+    },
+
     '& td .MuiRadio-colorSecondary.Mui-checked': {
       color: 'black',
     },
@@ -32,6 +45,9 @@ const useStyles = makeStyles({
 
 const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
   const classes = useStyles();
+
+  const [practitionerFilter, setPractitionerFilter] = useState('');
+  const [patientFilter, setPatientFilter] = useState('');
 
   //selectors
   const practitioners = useSelector((state) =>
@@ -100,9 +116,27 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
           <p className={classes.error} datacy="practitionerId-err">
             <span> {formik.errors.practitionerId} </span>
           </p>
+          <TextField
+            type="search"
+            variant="outlined"
+            margin="normal"
+            placeholder="search by name"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onChange={(e) => setPractitionerFilter(e.target.value)}
+          />
+
           <CustomTable
-            columns={['select', 'id', 'first name', 'last name', 'speciality']}
-            rows={practitioners.map((practitioner) => [
+            columns={['Select', 'Id', 'First name', 'Last name', 'Speciality']}
+            rows={filterByName(
+              practitioners,
+              practitionerFilter,
+            ).map((practitioner) => [
               <Radio
                 key={practitioner.id}
                 name="practitionerId"
@@ -123,9 +157,23 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
           <p className={classes.error} datacy="patientId-err">
             {formik.errors.patientId}
           </p>
+          <TextField
+            type="search"
+            variant="outlined"
+            margin="normal"
+            placeholder="search by name"
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+            onChange={(e) => setPatientFilter(e.target.value)}
+          />
           <CustomTable
-            columns={['select', 'id', 'first name', 'last name']}
-            rows={patients.map((patient) => [
+            columns={['Select', 'Id', 'First Name', 'Last Name']}
+            rows={filterByName(patients, patientFilter).map((patient) => [
               <Radio
                 key={patient.id}
                 name="patientId"
@@ -146,7 +194,7 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
             {formik.errors.availabilityId}
           </p>
           <CustomTable
-            columns={['select', 'id', 'date']}
+            columns={['Select', 'Id', 'Date']}
             rows={availabilities.map((availability) => [
               <Radio
                 key={availability.id}
