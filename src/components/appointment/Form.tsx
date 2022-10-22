@@ -1,13 +1,12 @@
-import { useSelector, useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 import { Button, Grid, Radio } from '@material-ui/core';
-import { getPractitioners, practitionersSelectors } from 'store/practitioners';
-import { getPatients, patientsSelectors } from 'store/patients';
-import { useEffect, useState } from 'react';
+import { practitionersSelectors } from 'store/practitioners';
+import { patientsSelectors } from 'store/patients';
+import { useEffect } from 'react';
 import { formatDateRange } from 'utils/date';
 import CustomTable from '../CustomTable';
 import { makeStyles } from '@material-ui/core';
 import { useFormik } from 'formik';
-import config from 'config';
 import useFetchAvailabilities from 'utils/useFetchAvailabilities';
 import AppointmentFormValues from 'types/AppointmentFormValues';
 
@@ -94,11 +93,13 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
   }
 
   return (
-    <form onSubmit={formik.handleSubmit}>
+    <form onSubmit={formik.handleSubmit} datacy="appointmentForm">
       <Grid className={classes.layout} container spacing={4}>
         <Grid item>
           <h4> Practitioners </h4>
-          <p className={classes.error}> {formik.errors.practitionerId} </p>
+          <p className={classes.error} datacy="practitionerId-err">
+            <span> {formik.errors.practitionerId} </span>
+          </p>
           <CustomTable
             columns={['select', 'id', 'first name', 'last name', 'speciality']}
             rows={practitioners.map((practitioner) => [
@@ -119,7 +120,9 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
 
         <Grid item>
           <h4> Patients </h4>
-          <p className={classes.error}> {formik.errors.patientId} </p>
+          <p className={classes.error} datacy="patientId-err">
+            {formik.errors.patientId}
+          </p>
           <CustomTable
             columns={['select', 'id', 'first name', 'last name']}
             rows={patients.map((patient) => [
@@ -139,7 +142,9 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
 
         <Grid item>
           <h4> Availabilities </h4>
-          <p className={classes.error}> {formik.errors.availabilityId} </p>
+          <p className={classes.error} datacy="availabilityId-err">
+            {formik.errors.availabilityId}
+          </p>
           <CustomTable
             columns={['select', 'id', 'date']}
             rows={availabilities.map((availability) => [

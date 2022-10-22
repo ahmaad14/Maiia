@@ -50,7 +50,7 @@ const AppointmentList = () => {
   };
 
   return (
-    <div>
+    <div datacy="appointmentList">
       <CustomTable
         columns={[
           'Id',
