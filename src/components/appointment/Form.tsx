@@ -81,14 +81,12 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
         `${SERVER_API_ENDPOINT}/availabilities?practitionerId=${+practitionerId}`,
       );
       const parsedResponse = await response.json();
+      setAvailabilities(parsedResponse);
+
       return parsedResponse;
     };
 
-    const get = async () => {
-      setAvailabilities(await getAvailabilities());
-    };
-
-    if (isCurrent) get();
+    if (isCurrent) getAvailabilities();
 
     return () => {
       isCurrent = false;
@@ -183,7 +181,12 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
           />
         </Grid>
       </Grid>
-      <Button type="submit" variant="contained" color="primary">
+      <Button
+        fullWidth={true}
+        type="submit"
+        variant="contained"
+        color="primary"
+      >
         Submit
       </Button>
     </form>

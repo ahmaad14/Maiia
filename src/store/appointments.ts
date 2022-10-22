@@ -24,14 +24,13 @@ export const addAppointment = createAsyncThunk(
       body: JSON.stringify(appointment),
     });
     const parsedResponse = await response.json();
-    console.log(parsedResponse);
     return parsedResponse;
   },
 );
 
 export const updateAppointment = createAsyncThunk(
   'updateAppointment',
-  async (appointment: Appointment) => {
+  async (appointment: AppointmentFormValues) => {
     const response = await fetch(`${SERVER_API_ENDPOINT}/appointments`, {
       method: 'PUT',
       body: JSON.stringify(appointment),
