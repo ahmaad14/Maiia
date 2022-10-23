@@ -7,7 +7,7 @@ import AppointmentFormValues from 'types/AppointmentFormValues';
 import { FormikContextType } from 'formik';
 
 // utils
-import filterByName from '../../utils/filterByName';
+import searchFilter from '../../utils/searchFilter';
 import debounce from '../../utils/debounce';
 
 // components
@@ -47,18 +47,25 @@ const PatientsTable = ({ formik, errorClassName }: Props) => {
 
       <CustomTable
         columns={['Select', 'Id', 'First Name', 'Last Name']}
-        rows={filterByName(patients, patientFilter).map((patient) => [
-          <Radio
-            key={patient.id}
-            name="patientId"
-            value={patient.id}
-            onChange={formik.handleChange}
-            checked={patient.id === +patientId}
-          />,
-          patient.id,
-          patient.firstName,
-          patient.lastName,
-        ])}
+        rows={patients
+          .filter((patient) =>
+            searchFilter(
+              `${patient.firstName} ${patient.lastName}`,
+              patientFilter,
+            ),
+          )
+          .map((patient) => [
+            <Radio
+              key={patient.id}
+              name="patientId"
+              value={patient.id}
+              onChange={formik.handleChange}
+              checked={patient.id === +patientId}
+            />,
+            patient.id,
+            patient.firstName,
+            patient.lastName,
+          ])}
       />
     </>
   );
