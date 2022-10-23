@@ -70,6 +70,9 @@ const AppointmentList = () => {
     );
   };
 
+  const handleOpenUpdateDialogue = () => setOpenUpdateDialog(true);
+  const handleCloseUpdateDialogue = () => setOpenUpdateDialog(false);
+
   return (
     <div datacy="appointmentList">
       <SearchInput
@@ -103,7 +106,7 @@ const AppointmentList = () => {
             <Button
               startIcon={<UpdateIcon />}
               onClick={() => {
-                setOpenUpdateDialog(true);
+                handleOpenUpdateDialogue();
                 setUpdateFormDefaultValues(appointment);
               }}
               datacy={`appointmentUpdate-${appointment.id}`}
@@ -111,7 +114,7 @@ const AppointmentList = () => {
           </>,
         ])}
       />
-      <Dialog open={openUpdateDialog}>
+      <Dialog open={openUpdateDialog} onClose={handleCloseUpdateDialogue}>
         <div className={classes.dialogueContent}>
           <Form
             onSubmit={handleUpdate}
@@ -121,7 +124,7 @@ const AppointmentList = () => {
             className={classes.closeBtn}
             fullWidth={true}
             variant="outlined"
-            onClick={() => setOpenUpdateDialog(false)}
+            onClick={handleCloseUpdateDialogue}
           >
             Close
           </Button>
