@@ -35,6 +35,11 @@ const PractitionersTable = ({ formik, errorClassName }: Props) => {
   };
   const debouncedHandleSearch = debounce(handleSearch, 500);
 
+  const handleChange = (e) => {
+    formik.setFieldValue('availabilityId', '');
+    formik.handleChange(e);
+  };
+
   return (
     <Grid item>
       <h4> Practitioners </h4>
@@ -59,7 +64,7 @@ const PractitionersTable = ({ formik, errorClassName }: Props) => {
             <Radio
               key={practitioner.id}
               name="practitionerId"
-              onChange={formik.handleChange}
+              onChange={handleChange}
               value={practitioner.id}
               checked={practitioner.id === +practitionerId}
             />,

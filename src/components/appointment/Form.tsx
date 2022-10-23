@@ -50,19 +50,7 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
     },
     validate,
     validateOnChange: false,
-    onSubmit: (data) => {
-      const selectedAvailability = availabilities.find(
-        (availability) => availability.id === +data.availabilityId,
-      );
-      const newAppointment = {
-        ...defaultValues,
-        patientId: +data.patientId,
-        practitionerId: +data.practitionerId,
-        startDate: selectedAvailability.startDate,
-        endDate: selectedAvailability.endDate,
-      };
-      onSubmit(newAppointment);
-    },
+    onSubmit: handleSubmit,
   });
 
   const { practitionerId, availabilityId } = formik.values;
@@ -81,10 +69,6 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
     }
   }, [availabilities]);
 
-  useEffect(() => {
-    formik.setFieldValue('availabilityId', '');
-  }, [practitionerId]);
-
   function validate(values) {
     const errors = {};
     const requiredFields = ['practitionerId', 'patientId', 'availabilityId'];
@@ -92,6 +76,20 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
       if (!values[field]) errors[field] = 'Required';
     });
     return errors;
+  }
+  function handleSubmit(data) {
+    const selectedAvailability = availabilities.find(
+      (availability) => availability.id === +data.availabilityId,
+    );
+    const newAppointment = {
+      ...defaultValues,
+      patientId: +data.patientId,
+      practitionerId: +data.practitionerId,
+      startDate: selectedAvailability.startDate,
+      endDate: selectedAvailability.endDate,
+    };
+    formik.resetForm();
+    onSubmit(newAppointment);
   }
   return (
     <form onSubmit={formik.handleSubmit} datacy="appointmentForm">

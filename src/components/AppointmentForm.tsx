@@ -10,7 +10,6 @@ const AppointmentForm = () => {
   useEffect(() => {
     dispatch(getPractitioners());
     dispatch(getPatients());
-    dispatch(getAppointments());
   }, []);
   const handleSubmit = (values) => {
     dispatch(addAppointment(values));
