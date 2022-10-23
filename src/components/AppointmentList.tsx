@@ -98,6 +98,7 @@ const AppointmentList = () => {
             <Button
               startIcon={<DeleteIcon />}
               onClick={() => handleDelete(appointment.id)}
+              datacy={`appointmentDelete-${appointment.id}`}
             />
             <Button
               startIcon={<UpdateIcon />}
@@ -105,6 +106,7 @@ const AppointmentList = () => {
                 setOpenUpdateDialog(true);
                 setUpdateFormDefaultValues(appointment);
               }}
+              datacy={`appointmentUpdate-${appointment.id}`}
             />
           </>,
         ])}

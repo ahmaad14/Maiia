@@ -24,21 +24,24 @@ describe('Appointments page', () => {
           .should('eq', body.length);
     });
   });
-  it('shouldnt display error when submitting the form without choosing patient', () => {
+  it('should display error when submitting the form without choosing a patient', () => {
     cy.pick('appointmentForm').submit();
     cy.pick('patientId-err').contains('Required');
   });
-  it('shouldnt display error when submitting the form without chossing availability', () => {
+  it('should display error when submitting the form without chossing availability', () => {
     cy.pick('appointmentForm').submit();
     cy.pick('availabilityId-err').contains('Required');
   });
 
-  it('should send a request after submitting the form with all required values', () => {
+  it('should add new appointment row after submitting the form', () => {
     cy.get('input[name = practitionerId]').first().click();
     cy.get('input[name = patientId]').first().click();
     cy.get('input[name = availabilityId]').first().click();
     cy.intercept('POST', '**/appointments').as('addAppointment');
     cy.pick('appointmentForm').submit();
-    cy.wait('@addAppointment').its('response.statusCode').should('eq', 200);
+    cy.wait('@addAppointment').then((interceptor) => {
+      const appointmentId = interceptor.response.body.id;
+      cy.pick(`appointmentUpdate-${appointmentId}`).should('exist');
+    });
   });
 });
