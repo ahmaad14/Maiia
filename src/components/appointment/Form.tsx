@@ -19,6 +19,7 @@ import { useFormik } from 'formik';
 import useFetchAvailabilities from 'utils/useFetchAvailabilities';
 import AppointmentFormValues from 'types/AppointmentFormValues';
 import filterByName from '../../utils/filterByName';
+import debounce from '../../utils/debounce';
 type Props = {
   onSubmit: (formValues: AppointmentFormValues) => void;
   defaultValues?: AppointmentFormValues;
@@ -108,6 +109,11 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
     return errors;
   }
 
+  const handleSearch = (value, setValue: (value: string) => any) => {
+    setValue(value);
+  };
+  const debouncedHandleSearch = debounce(handleSearch, 500);
+
   return (
     <form onSubmit={formik.handleSubmit} datacy="appointmentForm">
       <Grid className={classes.layout} container spacing={4}>
@@ -128,9 +134,10 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
                 </InputAdornment>
               ),
             }}
-            onChange={(e) => setPractitionerFilter(e.target.value)}
+            onChange={(e) =>
+              debouncedHandleSearch(e.target.value, setPractitionerFilter)
+            }
           />
-
           <CustomTable
             columns={['Select', 'Id', 'First name', 'Last name', 'Speciality']}
             rows={filterByName(
@@ -169,7 +176,9 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
                 </InputAdornment>
               ),
             }}
-            onChange={(e) => setPatientFilter(e.target.value)}
+            onChange={(e) =>
+              debouncedHandleSearch(e.target.value, setPatientFilter)
+            }
           />
           <CustomTable
             columns={['Select', 'Id', 'First Name', 'Last Name']}

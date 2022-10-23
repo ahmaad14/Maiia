@@ -5,7 +5,7 @@ type Filterable = {
 
 const filterByName = (list: Filterable[], filter: string) => {
   return list.filter((item) => {
-    const fullName = `${item.firstName} ${item.lastName}`.toLowerCase();
+    const fullName = `${item.firstName} ${item.lastName}`.trim().toLowerCase();
     return fullName.includes(filter.toLowerCase());
   });
 };
