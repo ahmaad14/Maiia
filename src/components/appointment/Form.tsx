@@ -1,35 +1,31 @@
-import { useSelector } from 'react-redux';
-
-import {
-  Button,
-  Grid,
-  Radio,
-  InputAdornment,
-  TextField,
-} from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
-
-import { practitionersSelectors } from 'store/practitioners';
-import { patientsSelectors } from 'store/patients';
-import { useEffect, useState } from 'react';
-import { formatDateRange } from 'utils/date';
-import CustomTable from '../CustomTable';
+import { useEffect } from 'react';
 import { makeStyles } from '@material-ui/core';
 import { useFormik } from 'formik';
-import useFetchAvailabilities from 'utils/useFetchAvailabilities';
+
+// types
 import AppointmentFormValues from 'types/AppointmentFormValues';
-import filterByName from '../../utils/filterByName';
-import debounce from '../../utils/debounce';
+
+// utils
+import useFetchAvailabilities from 'utils/useFetchAvailabilities';
+
+// components
+import { Button, Grid } from '@material-ui/core';
+import PractitionersTable from './PractitionersTable';
+import PatientsTable from './PatientsTable';
+import AvailabilitiesTable from './AvailabilitiesTable';
+
 type Props = {
   onSubmit: (formValues: AppointmentFormValues) => void;
   defaultValues?: AppointmentFormValues;
 };
 const useStyles = makeStyles({
   layout: {
-    alignItems: 'flex-start !important',
     justifyContent: 'space-between',
     marginBlock: 20,
-    '& > div': {
+    '&.MuiGrid-container': {
+      alignItems: 'flex-start !important',
+    },
+    '& > .MuiGrid-item': {
       minWidth: '50%',
     },
 
@@ -46,17 +42,6 @@ const useStyles = makeStyles({
 
 const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
   const classes = useStyles();
-
-  const [practitionerFilter, setPractitionerFilter] = useState('');
-  const [patientFilter, setPatientFilter] = useState('');
-
-  //selectors
-  const practitioners = useSelector((state) =>
-    practitionersSelectors.selectAll(state.practitioners),
-  );
-  const patients = useSelector((state) =>
-    patientsSelectors.selectAll(state.patients),
-  );
 
   const formik = useFormik({
     initialValues: {
@@ -80,7 +65,7 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
     },
   });
 
-  const { practitionerId, patientId, availabilityId } = formik.values;
+  const { practitionerId, availabilityId } = formik.values;
   const availabilities = useFetchAvailabilities(practitionerId);
 
   // get availability Id default value
@@ -108,117 +93,19 @@ const AppointmentForm = ({ onSubmit, defaultValues }: Props) => {
     });
     return errors;
   }
-
-  const handleSearch = (value, setValue: (value: string) => any) => {
-    setValue(value);
-  };
-  const debouncedHandleSearch = debounce(handleSearch, 500);
-
   return (
     <form onSubmit={formik.handleSubmit} datacy="appointmentForm">
       <Grid className={classes.layout} container spacing={4}>
         <Grid item>
-          <h4> Practitioners </h4>
-          <p className={classes.error} datacy="practitionerId-err">
-            <span> {formik.errors.practitionerId} </span>
-          </p>
-          <TextField
-            type="search"
-            variant="outlined"
-            margin="normal"
-            placeholder="search by name"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={(e) =>
-              debouncedHandleSearch(e.target.value, setPractitionerFilter)
-            }
-          />
-          <CustomTable
-            columns={['Select', 'Id', 'First name', 'Last name', 'Speciality']}
-            rows={filterByName(
-              practitioners,
-              practitionerFilter,
-            ).map((practitioner) => [
-              <Radio
-                key={practitioner.id}
-                name="practitionerId"
-                onChange={formik.handleChange}
-                value={practitioner.id}
-                checked={practitioner.id === +practitionerId}
-              />,
-              practitioner.id,
-              practitioner.firstName,
-              practitioner.lastName,
-              practitioner.speciality,
-            ])}
-          />
+          <PractitionersTable formik={formik} errorClassName={classes.error} />
         </Grid>
 
         <Grid item>
-          <h4> Patients </h4>
-          <p className={classes.error} datacy="patientId-err">
-            {formik.errors.patientId}
-          </p>
-          <TextField
-            type="search"
-            variant="outlined"
-            margin="normal"
-            placeholder="search by name"
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-            onChange={(e) =>
-              debouncedHandleSearch(e.target.value, setPatientFilter)
-            }
-          />
-          <CustomTable
-            columns={['Select', 'Id', 'First Name', 'Last Name']}
-            rows={filterByName(patients, patientFilter).map((patient) => [
-              <Radio
-                key={patient.id}
-                name="patientId"
-                value={patient.id}
-                onChange={formik.handleChange}
-                checked={patient.id === +patientId}
-              />,
-              patient.id,
-              patient.firstName,
-              patient.lastName,
-            ])}
-          />
+          <PatientsTable formik={formik} errorClassName={classes.error} />
         </Grid>
 
         <Grid item>
-          <h4> Availabilities </h4>
-          <p className={classes.error} datacy="availabilityId-err">
-            {formik.errors.availabilityId}
-          </p>
-          <CustomTable
-            columns={['Select', 'Id', 'Date']}
-            rows={availabilities.map((availability) => [
-              <Radio
-                key={availability.id}
-                name="availabilityId"
-                value={availability.id}
-                onChange={formik.handleChange}
-                checked={availability.id === +availabilityId}
-              />,
-              availability.id,
-              formatDateRange({
-                from: availability.startDate,
-                to: availability.endDate,
-              }),
-            ])}
-          />
+          <AvailabilitiesTable formik={formik} errorClassName={classes.error} />
         </Grid>
       </Grid>
       <Button
