@@ -1,4 +1,3 @@
-import { Button, Dialog, makeStyles } from '@material-ui/core';
 import { useEffect, useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -8,13 +7,22 @@ import {
   updateAppointment,
 } from 'store/appointments';
 import { practitionersSelectors } from 'store/practitioners';
-import { formatDateRange } from 'utils/date';
-import CustomTable from './CustomTable';
-import Form from './appointment/Form';
+
+// types
 import AppointmentFormValues from 'types/AppointmentFormValues';
 
+//utils
+import debounce from 'utils/debounce';
+import { formatDateRange } from 'utils/date';
+
+// components
+import { Button, Dialog, makeStyles } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/DeleteForever';
 import UpdateIcon from '@material-ui/icons/Edit';
+import Form from './appointment/Form';
+import CustomTable from './CustomTable';
+import SearchInput from './SearchInput';
+import searchFilter from 'utils/searchFilter';
 
 const useStyles = makeStyles({
   dialogueContent: {
@@ -26,10 +34,12 @@ const useStyles = makeStyles({
 });
 
 const AppointmentList = () => {
-  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
-  const [updateFormDefaultValues, setUpdateFormDefaultValues] = useState();
   const dispatch = useDispatch();
   const classes = useStyles();
+  const [filter, setFilter] = useState('');
+  const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
+  const [updateFormDefaultValues, setUpdateFormDefaultValues] = useState();
+
   const appointments = useSelector((state) =>
     appointmentSelectors.selectAll(state.appointments),
   );
@@ -49,8 +59,23 @@ const AppointmentList = () => {
     setOpenUpdateDialog(false);
   };
 
+  const handleSearch = (value: string) => {
+    setFilter(value);
+  };
+  const debouncedHandleSearch = debounce(handleSearch, 500);
+
+  const getFilteredAppointments = (appointments) => {
+    return appointments.filter((appointment) =>
+      searchFilter(getPractitionerName(appointment.practitionerId), filter),
+    );
+  };
+
   return (
     <div datacy="appointmentList">
+      <SearchInput
+        placeHolder="seach by practitioner name"
+        onChange={(value) => debouncedHandleSearch(value)}
+      />
       <CustomTable
         columns={[
           'Id',
@@ -60,7 +85,7 @@ const AppointmentList = () => {
           'Date',
           'Actions',
         ]}
-        rows={appointments.map((appointment) => [
+        rows={getFilteredAppointments(appointments).map((appointment) => [
           appointment.id,
           getPractitionerName(appointment.practitionerId),
           appointment.practitionerId,
