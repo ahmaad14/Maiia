@@ -11,9 +11,9 @@ import filterByName from '../../utils/filterByName';
 import debounce from '../../utils/debounce';
 
 // components
-import { Grid, Radio, InputAdornment, TextField } from '@material-ui/core';
-import SearchIcon from '@material-ui/icons/Search';
+import { Grid, Radio } from '@material-ui/core';
 import CustomTable from '../CustomTable';
+import SearchInput from 'components/SearchInput';
 
 type Props = {
   formik: FormikContextType<AppointmentFormValues>;
@@ -30,8 +30,8 @@ const PractitionersTable = ({ formik, errorClassName }: Props) => {
 
   const { practitionerId } = formik.values;
 
-  const handleSearch = (value, setValue: (value: string) => any) => {
-    setValue(value);
+  const handleSearch = (value: string) => {
+    setPractitionerFilter(value);
   };
   const debouncedHandleSearch = debounce(handleSearch, 500);
 
@@ -41,22 +41,11 @@ const PractitionersTable = ({ formik, errorClassName }: Props) => {
       <p className={errorClassName} datacy="practitionerId-err">
         <span> {formik.errors.practitionerId} </span>
       </p>
-      <TextField
-        type="search"
-        variant="outlined"
-        margin="normal"
-        placeholder="search by name"
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
-        onChange={(e) =>
-          debouncedHandleSearch(e.target.value, setPractitionerFilter)
-        }
+      <SearchInput
+        placeHolder="search by name"
+        onChange={(value) => debouncedHandleSearch(value)}
       />
+
       <CustomTable
         columns={['Select', 'Id', 'First name', 'Last name', 'Speciality']}
         rows={filterByName(

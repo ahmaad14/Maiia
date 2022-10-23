@@ -40,7 +40,10 @@ const PatientsTable = ({ formik, errorClassName }: Props) => {
       <p className={errorClassName} datacy="patientId-err">
         {formik.errors.patientId}
       </p>
-      <SearchInput onChange={(value) => debouncedHandleSearch(value)} />
+      <SearchInput
+        placeHolder="search by name"
+        onChange={(value) => debouncedHandleSearch(value)}
+      />
 
       <CustomTable
         columns={['Select', 'Id', 'First Name', 'Last Name']}

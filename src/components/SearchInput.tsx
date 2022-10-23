@@ -3,15 +3,16 @@ import SearchIcon from '@material-ui/icons/Search';
 
 type Props = {
   onChange: (searchValue) => void;
+  placeHolder: string;
 };
 
-const SearchInput = ({ onChange }: Props) => {
+const SearchInput = ({ onChange, placeHolder }: Props) => {
   return (
     <TextField
       type="search"
       variant="outlined"
       margin="normal"
-      placeholder="search by name"
+      placeholder={placeHolder}
       InputProps={{
         startAdornment: (
           <InputAdornment position="start">
