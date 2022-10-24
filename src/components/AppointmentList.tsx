@@ -43,14 +43,31 @@ const AppointmentList = () => {
   const appointments = useSelector((state) =>
     appointmentSelectors.selectAll(state.appointments),
   );
-  const practioners = useSelector((state) => state.practitioners);
+  const practitioners = useSelector((state) => state.practitioners);
+
+  // id => name pair
+  const practitionersNames = {};
+
   useEffect(() => {
     dispatch(getAppointments());
   }, []);
-  const getPractitionerName = (id) => {
-    const practitioner = practitionersSelectors.selectById(practioners, id);
-    return `${practitioner?.firstName} ${practitioner?.lastName}`;
+
+  const getPractitionersNames = () => {
+    const practitionersIds = new Set<number>(
+      appointments.map((appointment) => appointment.practitionerId),
+    );
+    practitionersIds.forEach((practitionerId) => {
+      const practitioner = practitionersSelectors.selectById(
+        practitioners,
+        practitionerId,
+      );
+      practitionersNames[
+        practitionerId
+      ] = `${practitioner.firstName} ${practitioner.lastName}`;
+    });
   };
+  getPractitionersNames();
+
   const handleDelete = (id: number) => {
     dispatch(deleteAppointment(id));
   };
@@ -66,7 +83,7 @@ const AppointmentList = () => {
 
   const getFilteredAppointments = (appointments) => {
     return appointments.filter((appointment) =>
-      searchFilter(getPractitionerName(appointment.practitionerId), filter),
+      searchFilter(practitionersNames[appointment.practitionerId], filter),
     );
   };
 
@@ -90,7 +107,7 @@ const AppointmentList = () => {
         ]}
         rows={getFilteredAppointments(appointments).map((appointment) => [
           appointment.id,
-          getPractitionerName(appointment.practitionerId),
+          practitionersNames[appointment.practitionerId],
           appointment.practitionerId,
           appointment.patientId,
           formatDateRange({
