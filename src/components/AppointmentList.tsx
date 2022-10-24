@@ -46,13 +46,14 @@ const AppointmentList = () => {
   const practitioners = useSelector((state) => state.practitioners);
 
   // id => name pair
-  const practitionersNames = {};
+  const practitionersNames = getPractitionersNames();
 
   useEffect(() => {
     dispatch(getAppointments());
   }, []);
 
-  const getPractitionersNames = () => {
+  function getPractitionersNames() {
+    const names = {};
     const practitionersIds = new Set<number>(
       appointments.map((appointment) => appointment.practitionerId),
     );
@@ -61,12 +62,12 @@ const AppointmentList = () => {
         practitioners,
         practitionerId,
       );
-      practitionersNames[
+      names[
         practitionerId
       ] = `${practitioner.firstName} ${practitioner.lastName}`;
     });
-  };
-  getPractitionersNames();
+    return names;
+  }
 
   const handleDelete = (id: number) => {
     dispatch(deleteAppointment(id));
