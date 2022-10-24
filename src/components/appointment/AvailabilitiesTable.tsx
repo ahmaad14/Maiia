@@ -1,14 +1,15 @@
+import { useSelector } from 'react-redux';
 // types
 import { FormikContextType } from 'formik';
 import AppointmentFormValues from 'types/AppointmentFormValues';
 
 // utils
-import useFetchAvailabilities from 'utils/useFetchAvailabilities';
 import { formatDateRange } from 'utils/date';
 
 // components
 import CustomTable from '../CustomTable';
 import { Radio } from '@material-ui/core';
+import { availabilitiesSelectors } from 'store/availabilities';
 
 type Props = {
   formik: FormikContextType<AppointmentFormValues>;
@@ -16,9 +17,10 @@ type Props = {
 };
 
 const AvailabilitiesTable = ({ formik, errorClassName }: Props) => {
-  const { practitionerId, availabilityId } = formik.values;
-  const availabilities = useFetchAvailabilities(practitionerId?.toString());
-
+  const { availabilityId } = formik.values;
+  const availabilities = useSelector((state) =>
+    availabilitiesSelectors.selectAll(state.availabilities),
+  );
   return (
     <>
       <h4> Availabilities </h4>

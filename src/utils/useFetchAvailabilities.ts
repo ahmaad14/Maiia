@@ -1,8 +1,23 @@
-import config from 'config';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+
+import {
+  getAvailabilities,
+  availabilitiesActions,
+  availabilitiesSelectors,
+} from 'store/availabilities';
+
 const useFetchAvailabilities = (practitionerId: string) => {
   const cache = useRef({});
-  const [availabilities, setAvailabilities] = useState([]);
+  const dispatch = useDispatch();
+  const availabilities = useSelector((state) =>
+    availabilitiesSelectors.selectAll(state.availabilities),
+  );
+
+  useEffect(() => {
+    if (availabilities.length)
+      cache.current[availabilities[0].practitionerId] = availabilities;
+  }, [availabilities]);
 
   useEffect(() => {
     if (!practitionerId) return;
@@ -11,17 +26,13 @@ const useFetchAvailabilities = (practitionerId: string) => {
     const fetchData = async () => {
       if (cache.current[practitionerId]) {
         const data = cache.current[practitionerId];
-        setAvailabilities(data);
+        if (isCurrent) {
+          dispatch(availabilitiesActions.setAvailabilities(data));
+        }
       } else {
-        const SERVER_API_ENDPOINT = config.get('SERVER_API_ENDPOING', '/api');
-
-        const response = await fetch(
-          `${SERVER_API_ENDPOINT}/availabilities?practitionerId=${+practitionerId}`,
-        );
-        const data = await response.json();
-
-        cache.current[practitionerId] = data;
-        if (isCurrent) setAvailabilities(data);
+        if (isCurrent) {
+          dispatch(getAvailabilities(practitionerId));
+        }
       }
     };
     fetchData();
