@@ -1,13 +1,23 @@
-import EditorLink from './EditorLink';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
+import { addAppointment } from 'store/appointments';
+import { getPatients } from 'store/patients';
+import { getPractitioners } from 'store/practitioners';
+import Form from './appointment/Form';
 
 const AppointmentForm = () => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(getPractitioners());
+    dispatch(getPatients());
+  }, []);
+  const handleSubmit = (values) => {
+    dispatch(addAppointment(values));
+  };
+
   return (
     <div>
-      Edit{' '}
-      <EditorLink path="src/components/AppointmentForm.tsx">
-        "src/components/AppointmentForm.tsx"
-      </EditorLink>{' '}
-      to implement Appointment form feature.
+      <Form onSubmit={handleSubmit} />
     </div>
   );
 };
